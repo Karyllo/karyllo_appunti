@@ -1,0 +1,13 @@
+{
+  "attachmentFolderPath": "paste",
+  "newFileLocation": "folder",
+  "newFileFolderPath": "6- full note",
+  "pdfExportSettings": {
+    "includeName": true,
+    "pageSize": "Letter",
+    "landscape": false,
+    "margin": "0",
+    "downscalePercent": 25
+  },
+  "alwaysUpdateLinks": true
+}

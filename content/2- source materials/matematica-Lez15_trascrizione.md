@@ -1,7 +1,3 @@
----
-title: "matematica-Lez15_trascrizione"
----
-
 _Tags:[[trascrizione]]. [[matematica numerica]]
 
 ## matematica- Lez15_trascrizione

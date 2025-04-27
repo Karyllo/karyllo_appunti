@@ -1,7 +1,3 @@
----
-title: "meccanica-Lez6_trascrizione"
----
-
 _Tags:[[trascrizione]]. [[meccanica razionale]]
 
 ## meccanica- Lez6_trascrizione

@@ -1,7 +1,3 @@
----
-title: "Autm - Lez02"
----
-
 2025-02-26 16:16
 
 _Status: #flashcard_zero  #riscritto_finito   #revisione_finita 

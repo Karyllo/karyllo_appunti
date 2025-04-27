@@ -1,7 +1,3 @@
----
-title: "Matenum- lez04"
----
-
 2025-02-25 12:45
 
 _Status: #flashcard_finite   #riscritto_zero  #revisione_zero 

@@ -1,7 +1,3 @@
----
-title: "temporaneo 3"
----
-
 
 
 I teoremi enunciati senza dimostrazione sono in ==*corsivo*==. I teoremi con dimostrazione inclusa nel solo programma completo sono indicati in rosso.

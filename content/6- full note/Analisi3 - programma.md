@@ -1,7 +1,3 @@
----
-title: "Analisi3 - programma"
----
-
 2025-04-26 18:26
 
 _Status: #flashcard_zero  #riscritto_zero  #revisione_zero 

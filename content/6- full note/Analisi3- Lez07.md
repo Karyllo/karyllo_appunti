@@ -1,7 +1,3 @@
----
-title: "Analisi3- Lez07"
----
-
 2025-02-19 21:30
 
 _Status: #flashcard_finite  #revisione_finita   #riscritto_finito #domande

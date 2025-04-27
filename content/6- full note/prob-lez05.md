@@ -1,7 +1,3 @@
----
-title: "prob-lez05"
----
-
 2025-02-25 13:16
 
 _Status: #flashcard_zero  #riscritto_zero  #revisione_finita  

@@ -1,7 +1,3 @@
----
-title: "meccanica-lez02"
----
-
  2025-02-27 20:47
 
 _Status: #flashcard_finite   #riscritto_finito   #revisione_finita 

@@ -1,71 +1,73 @@
+// sistematore.cjs
 const fs = require("fs")
 const path = require("path")
 
-const contentDir = path.join(process.cwd(), "content")
-const indexFile = path.join(contentDir, "index.md")
+const contentDir = path.join(__dirname, "content")
 
-function findMarkdownFiles(dir) {
-  let files = []
-  for (const file of fs.readdirSync(dir)) {
-    const fullPath = path.join(dir, file)
-    const stat = fs.statSync(fullPath)
+function aggiustaFrontmatter(data) {
+  const now = new Date()
+  const formattedDate = now.toISOString().slice(0, 10) // formato YYYY-MM-DD
+  const formattedTime = now.toTimeString().slice(0, 5)  // formato HH:MM
+
+  // Trova il frontmatter
+  const match = data.match(/^---\n([\s\S]*?)\n---/)
+  if (!match) {
+    return data // se non esiste frontmatter, non facciamo nulla
+  }
+
+  const frontmatter = match[1]
+  const lines = frontmatter.split("\n")
+  const fields = lines.map(line => line.split(":")[0].trim())
+
+  let newFrontmatter = frontmatter
+
+  if (!fields.includes("draft")) {
+    newFrontmatter += `\ndraft: false`
+  }
+  if (!fields.includes("tags")) {
+    newFrontmatter += `\ntags: []`
+  }
+  if (!fields.includes("created")) {
+    newFrontmatter += `\ncreated: ${formattedDate} ${formattedTime}`
+  }
+
+  if (newFrontmatter !== frontmatter) {
+    // Ricostruisce il file con frontmatter aggiornato
+    const restOfFile = data.slice(match[0].length)
+    return `---\n${newFrontmatter}\n---${restOfFile}`
+  }
+
+  return data // già corretto
+}
+
+function correggiFile(filePath) {
+  const ext = path.extname(filePath)
+  if (ext !== ".md") return
+
+  const data = fs.readFileSync(filePath, "utf8")
+  const nuovoData = aggiustaFrontmatter(data)
+  
+  if (nuovoData !== data) {
+    fs.writeFileSync(filePath, nuovoData, "utf8")
+    console.log(`✅ Frontmatter corretto: ${filePath}`)
+  }
+}
+
+function scanDirectory(directory) {
+  const files = fs.readdirSync(directory)
+  for (const file of files) {
+    const filePath = path.join(directory, file)
+    const stat = fs.statSync(filePath)
+
     if (stat.isDirectory()) {
-      files = files.concat(findMarkdownFiles(fullPath))
-    } else if (file.endsWith(".md")) {
-      files.push(fullPath)
+      scanDirectory(filePath)
+    } else {
+      correggiFile(filePath)
     }
   }
-  return files
 }
 
-function ensureFrontmatter(filepath) {
-  let content = fs.readFileSync(filepath, "utf-8")
-  if (!content.startsWith("---")) {
-    const title = path.basename(filepath, ".md")
-    const newContent = `---
-title: "${title}"
----
-
-${content}`
-    fs.writeFileSync(filepath, newContent, "utf-8")
-    console.log(`✅ Frontmatter aggiunto a: ${filepath}`)
-  }
-}
-
-function createIndex(files) {
-  let links = files
-    .filter(f => !f.endsWith("index.md"))
-    .map(f => {
-      const relativePath = path.relative(contentDir, f).replace(/\.md$/, "")
-      return `- [[${relativePath}]]`
-    })
-    .join("\n")
-
-  const indexContent = `---
-title: "Indice"
----
-
-# Indice degli appunti
-
-${links}
-`
-  fs.writeFileSync(indexFile, indexContent, "utf-8")
-  console.log(`📜 Creato nuovo index.md con ${files.length - 1} link!`)
-}
-
-function main() {
-  console.log("🔍 Scansiono tutti i file Markdown...")
-  const files = findMarkdownFiles(contentDir)
-
-  console.log("🛠️ Sistemo i frontmatter...")
-  for (const file of files) {
-    ensureFrontmatter(file)
-  }
-
-  console.log("📝 Creo/aggiorno index.md...")
-  createIndex(files)
-
-  console.log("🎯 Sistemazione completata!")
-}
-
-main()
+// Inizia la sistemazione
+console.log("🔍 Scansiono tutti i file Markdown per sistemare il frontmatter...")
+scanDirectory(contentDir)
+console.log("🎯 Sistemazione completata!")

@@ -1,7 +1,3 @@
----
-title: "Matenum- Lab01"
----
-
 2025-03-15 12:53
 
 _Status: #flashcard_zero  #riscritto_zero  #revisione_zero 

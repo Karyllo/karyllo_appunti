@@ -1,7 +1,3 @@
----
-title: "mateNum- Lez16_trascrizione"
----
-
 2025-04-25 10:38
 
 _Tags:[[trascrizione]]. [[matematica numerica]]

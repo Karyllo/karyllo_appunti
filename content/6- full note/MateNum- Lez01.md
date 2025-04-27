@@ -1,7 +1,3 @@
----
-title: "MateNum- Lez01"
----
-
 2025-02-18 10:17
 
 Status: #revisione_finita #flashcard_finite #riscritto_in_corso 

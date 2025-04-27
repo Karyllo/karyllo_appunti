@@ -1,7 +1,3 @@
----
-title: "prob-ese05"
----
-
 2025-03-18 10:16
 
 _Status: #flashcard_zero  #riscritto_zero  #revisione_zero 

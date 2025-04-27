@@ -1,7 +1,3 @@
----
-title: "settimana 7"
----
-
 2025-04-14 14:46
 
 _Status: #settimana_in_corso

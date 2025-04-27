@@ -1,7 +1,3 @@
----
-title: "Prob- Lez01"
----
-
 2025-02-17 19:48
 
 Status: #revisione_zero #flashcard_zero #riscritto_zero   

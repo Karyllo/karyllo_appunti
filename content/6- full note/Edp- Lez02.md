@@ -1,7 +1,3 @@
----
-title: "Edp- Lez02"
----
-
 2025-02-18 15:21
 
 _Status: #revisione_zero #flashcard_zero #riscritto_zero 

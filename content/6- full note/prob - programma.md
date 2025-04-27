@@ -1,7 +1,3 @@
----
-title: "prob - programma"
----
-
 2025-04-26 18:51
 
 _Status: #flashcard_zero  #riscritto_zero  #revisione_zero 

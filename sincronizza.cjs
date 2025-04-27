@@ -1,12 +1,11 @@
-// sincronizza.cjs
 const { execSync } = require("child_process")
 const readline = require("readline")
 const fs = require("fs")
 const path = require("path")
 
-const origine = "/Users/mak/Karyl/Università/Obsidian Karyl/obsidian Karyl"
-const destinazione = path.join(__dirname, "content")
-const backup = path.join(__dirname, "backup_obsidian")
+const origine = "/Users/mak/Karyl/Università/Obsidian Karyl/obsidian Karyl/"
+const destinazione = "/Users/mak/quartz/content/"
+const backup = "/Users/mak/quartz/backup_obsidian"
 
 function askQuestion(query) {
   const rl = readline.createInterface({
@@ -29,7 +28,7 @@ async function main() {
 
   console.log("🔒 Creo un backup degli appunti originali...")
   try {
-    fs.rmSync(backup, { recursive: true, force: true })
+    fs.rmSync(backup, { recursive: true, force: true }) // Elimina vecchio backup se esiste
     execSync(`cp -r "${origine}" "${backup}"`, { stdio: "inherit" })
     console.log(`✅ Backup salvato in ${backup}`)
   } catch (err) {
@@ -37,12 +36,12 @@ async function main() {
     return
   }
 
-  console.log("🔄 Copio i file nuovi in Quartz...")
+  console.log("🔄 Sincronizzo i file in Quartz con rsync...")
   try {
-    execSync(`cp -r "${origine}/"* "${destinazione}/"`, { stdio: "inherit" })
-    console.log("✅ Copiati!")
+    execSync(`rsync -av --delete "${origine}" "${destinazione}"`, { stdio: "inherit" })
+    console.log("✅ File sincronizzati!")
   } catch (err) {
-    console.error("❌ Errore nella copia dei file:", err)
+    console.error("❌ Errore nella sincronizzazione:", err)
     return
   }
 

@@ -1,7 +1,3 @@
----
-title: "meccanica - programma"
----
-
 2025-04-26 18:22
 
 _Status: #flashcard_zero  #riscritto_zero  #revisione_zero 

@@ -1,7 +1,3 @@
----
-title: "Prob- Ese01"
----
-
 2025-02-25 12:26
 
 _Status: #flashcard_finite   #riscritto_zero  #revisione_zero 

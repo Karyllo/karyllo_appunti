@@ -1,7 +1,3 @@
----
-title: "tutorial chiamate telefoniche STUDIO 2"
----
-
 2025-04-24 13:02
 
 _Status: #flashcard_zero  #riscritto_zero  #revisione_zero 

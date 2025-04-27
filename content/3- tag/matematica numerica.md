@@ -1,4 +1,0 @@
----
-title: "matematica numerica"
----
-

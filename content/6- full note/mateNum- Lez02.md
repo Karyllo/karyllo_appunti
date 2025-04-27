@@ -1,7 +1,3 @@
----
-title: "mateNum- Lez02"
----
-
 2025-02-19 15:25
 
 _Status: #flashcard_finite   #riscritto_finito  #revisione_finita 

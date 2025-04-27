@@ -1,7 +1,3 @@
----
-title: "temporaneo_2"
----
-
 # Appunti Lezione: Sistemi Sovradeterminati, Minimi Quadrati e Collegamento alle Equazioni Normali
 
 ## 1. Introduzione ai Sistemi Sovradeterminati

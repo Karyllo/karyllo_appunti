@@ -1,7 +1,3 @@
----
-title: "Autm - Lez01"
----
-
 tags: [[automatica]] [[sbobine]]
 stato: #revisione_finita #flashcard_finite  #riscritto_finito
 ### Introduzione ai Sistemi Dinamici

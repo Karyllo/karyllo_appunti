@@ -60,10 +60,15 @@ async function main() {
 
     // 2. Sincronizzazione con rsync
     console.log("🔄 Sincronizzo con rsync...");
-    const rsyncResult = spawnSync('rsync', ['-av', '--delete', '--exclude', '5-template/', srcDir + path.sep, destDir + path.sep], { stdio: 'inherit' });
+    const rsyncResult = spawnSync('rsync', ['-av', '--delete', '--exclude', '5-template/', srcDir + path.sep, destDir + path.sep], { stdio: 'pipe' });
     if (rsyncResult.status !== 0) {
         console.error(`❌ Errore: rsync ha restituito codice ${rsyncResult.status}`);
         process.exit(rsyncResult.status || 1);
+    }
+    if (rsyncResult.stdout && rsyncResult.stdout.toString().trim() === '') {
+        console.log("📁 Nessun cambiamento da sincronizzare.");
+    } else {
+        console.log("✅ Sincronizzazione completata con modifiche.");
     }
 
     // 3. Sistemazione Markdown

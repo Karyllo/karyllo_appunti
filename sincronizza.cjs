@@ -1,68 +1,151 @@
-const { execSync } = require("child_process")
-const readline = require("readline")
-const fs = require("fs")
-const path = require("path")
+#!/usr/bin/env node
+'use strict';
+const fs = require('fs');
+const path = require('path');
+const { spawnSync, spawn } = require('child_process');
+const readline = require('readline');
 
-const origine = "/Users/mak/Karyl/Università/Obsidian Karyl/obsidian Karyl/"
-const destinazione = "/Users/mak/quartz/content/"
-const backup = "/Users/mak/quartz/backup_obsidian"
+// Richiede il pacchetto 'js-yaml' per validare il frontmatter
+let yaml;
+try {
+    yaml = require('js-yaml');
+} catch (e) {
+    console.warn("Avviso: modulo 'js-yaml' non trovato. Validazione YAML disabilitata.");
+}
 
+// CONFIGURAZIONE: Modifica qui i percorsi!
+const OBSIDIAN_FOLDER = "/Users/mak/Karyl/Università/Obsidian Karyl/obsidian Karyl";
+const QUARTZ_ROOT = "/Users/mak/quartz";
+const CONTENT_FOLDER = path.join(QUARTZ_ROOT, "content");
+const BACKUP_FOLDER = path.join(QUARTZ_ROOT, "backup_obsidian");
+
+// Funzione per strip finale slash
+function stripTrailingSlash(p) {
+    if (!p) return p;
+    return p.endsWith(path.sep) ? p.slice(0, -1) : p;
+}
+
+const srcDir = stripTrailingSlash(OBSIDIAN_FOLDER);
+const destDir = stripTrailingSlash(CONTENT_FOLDER);
+
+// Funzione per chiedere conferma
 function askQuestion(query) {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  })
-  return new Promise(resolve => rl.question(query, ans => {
-    rl.close()
-    resolve(ans)
-  }))
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
+    return new Promise(resolve => rl.question(query, ans => {
+        rl.close();
+        resolve(ans);
+    }));
 }
 
 async function main() {
-  const answer = await askQuestion("⚡ Vuoi davvero sincronizzare e sovrascrivere i file? (si/no): ")
+    const answer = await askQuestion("⚡ Vuoi davvero sincronizzare e sovrascrivere i file? (sì/no): ");
+    if (answer.trim().toLowerCase() !== "sì") {
+        console.log("❌ Sincronizzazione annullata.");
+        return;
+    }
 
-  if (answer.trim().toLowerCase() !== "si") {
-    console.log("❌ Sincronizzazione annullata.")
-    return
-  }
+    // 1. Backup
+    console.log("🔒 Creo backup della cartella Obsidian...");
+    try {
+        fs.rmSync(BACKUP_FOLDER, { recursive: true, force: true });
+        spawnSync('cp', ['-r', srcDir, BACKUP_FOLDER], { stdio: 'inherit' });
+        console.log(`✅ Backup salvato in ${BACKUP_FOLDER}`);
+    } catch (err) {
+        console.error("❌ Errore nella creazione del backup:", err);
+        return;
+    }
 
-  console.log("🔒 Creo un backup degli appunti originali...")
-  try {
-    fs.rmSync(backup, { recursive: true, force: true }) // Elimina vecchio backup se esiste
-    execSync(`cp -r "${origine}" "${backup}"`, { stdio: "inherit" })
-    console.log(`✅ Backup salvato in ${backup}`)
-  } catch (err) {
-    console.error("❌ Errore nella creazione del backup:", err)
-    return
-  }
+    // 2. Sincronizzazione con rsync
+    console.log("🔄 Sincronizzo con rsync...");
+    const rsyncResult = spawnSync('rsync', ['-av', '--delete', '--exclude', '5-template/', srcDir + path.sep, destDir + path.sep], { stdio: 'inherit' });
+    if (rsyncResult.status !== 0) {
+        console.error(`❌ Errore: rsync ha restituito codice ${rsyncResult.status}`);
+        process.exit(rsyncResult.status || 1);
+    }
 
-  console.log("🔄 Sincronizzo i file in Quartz con rsync...")
-  try {
-    execSync(`rsync -av --delete "${origine}" "${destinazione}"`, { stdio: "inherit" })
-    console.log("✅ File sincronizzati!")
-  } catch (err) {
-    console.error("❌ Errore nella sincronizzazione:", err)
-    return
-  }
+    // 3. Sistemazione Markdown
+    console.log("🛠️ Sistemo i file Markdown...");
+    function fixMarkdownFiles(dir) {
+        let entries;
+        try {
+            entries = fs.readdirSync(dir);
+        } catch (err) {
+            console.error(`Impossibile leggere ${dir}: ${err.message}`);
+            return;
+        }
+        for (const entry of entries) {
+            const fullPath = path.join(dir, entry);
+            let stat;
+            try {
+                stat = fs.lstatSync(fullPath);
+            } catch (err) {
+                console.error(`Impossibile accedere a ${fullPath}: ${err.message}`);
+                continue;
+            }
+            if (stat.isDirectory()) {
+                fixMarkdownFiles(fullPath);
+            } else if (stat.isFile()) {
+                const ext = path.extname(entry).toLowerCase();
+                if (ext === '.md') {
+                    try {
+                        let content = fs.readFileSync(fullPath, 'utf8').trim();
+                        if (content.length === 0) {
+                            console.warn(`Avviso: file Markdown vuoto ignorato -> ${fullPath}`);
+                            continue;
+                        }
+                        if (!content.startsWith('---')) {
+                            console.warn(`Avviso: frontmatter mancante -> ${fullPath}`);
+                            continue;
+                        }
+                        const lines = content.split(/\r?\n/);
+                        let secondDashIndex = lines.findIndex((line, i) => i > 0 && line.trim() === '---');
+                        if (secondDashIndex === -1) {
+                            console.warn(`Avviso: frontmatter non chiuso -> ${fullPath}`);
+                            lines.push('---');
+                            content = lines.join('\n');
+                        }
+                        if (yaml) {
+                            try {
+                                yaml.load(lines.slice(1, secondDashIndex !== -1 ? secondDashIndex : undefined).join('\n'));
+                            } catch (e) {
+                                console.error(`Errore YAML in ${fullPath}: ${e.message}`);
+                            }
+                        }
+                        fs.writeFileSync(fullPath, content, 'utf8');
+                    } catch (err) {
+                        console.error(`Errore leggendo ${fullPath}: ${err.message}`);
+                    }
+                }
+            }
+        }
+    }
+    fixMarkdownFiles(CONTENT_FOLDER);
 
-  console.log("🛠️ Sistemo i file con il sistematore...")
-  try {
-    execSync(`node sistematore.cjs`, { stdio: "inherit" })
-    console.log("✅ File sistemati!")
-  } catch (err) {
-    console.error("❌ Errore nella sistemazione:", err)
-    return
-  }
-
-  console.log("📤 Preparo il push su GitHub...")
-  try {
-    execSync(`git add .`, { stdio: "inherit" })
-    execSync(`git commit -m "Sync contenuti automatico"`, { stdio: "inherit" })
-    execSync(`git push`, { stdio: "inherit" })
-    console.log("🚀 Tutto sincronizzato e online!")
-  } catch (err) {
-    console.error("❌ Errore nel push su GitHub:", err)
-  }
+    // 4. Build Quartz
+    console.log("🏗️ Build Quartz...");
+    const buildProc = spawn('npm', ['run', 'build'], { cwd: QUARTZ_ROOT });
+    buildProc.stdout.pipe(process.stdout);
+    buildProc.stderr.pipe(process.stderr);
+    buildProc.on('close', code => {
+        if (code !== 0) {
+            console.error(`❌ Build fallita con codice ${code}`);
+        } else {
+            console.log("✅ Build completata");
+            // 5. Push su GitHub
+            console.log("📤 Git push...");
+            spawnSync('git', ['add', '-A'], { cwd: QUARTZ_ROOT, stdio: 'inherit' });
+            spawnSync('git', ['commit', '-m', 'Sync automatico'], { cwd: QUARTZ_ROOT, stdio: 'inherit' });
+            const pushResult = spawnSync('git', ['push'], { cwd: QUARTZ_ROOT, stdio: 'inherit' });
+            if (pushResult.status !== 0) {
+                console.error(`❌ Push fallito con codice ${pushResult.status}`);
+            } else {
+                console.log("🚀 Push completato!");
+            }
+        }
+    });
 }
 
-main()
+main();

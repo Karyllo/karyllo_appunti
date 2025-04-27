@@ -1,73 +1,98 @@
-// sistematore.cjs
 const fs = require("fs")
 const path = require("path")
 
-const contentDir = path.join(__dirname, "content")
+const contentDir = "./content"
 
-function aggiustaFrontmatter(data) {
-  const now = new Date()
-  const formattedDate = now.toISOString().slice(0, 10) // formato YYYY-MM-DD
-  const formattedTime = now.toTimeString().slice(0, 5)  // formato HH:MM
-
-  // Trova il frontmatter
-  const match = data.match(/^---\n([\s\S]*?)\n---/)
-  if (!match) {
-    return data // se non esiste frontmatter, non facciamo nulla
+function fixFrontmatter(content) {
+  if (!content.startsWith("---")) {
+    // File senza frontmatter YAML valido, non toccare
+    return null
   }
 
-  const frontmatter = match[1]
-  const lines = frontmatter.split("\n")
-  const fields = lines.map(line => line.split(":")[0].trim())
+  const parts = content.split("---")
 
-  let newFrontmatter = frontmatter
-
-  if (!fields.includes("draft")) {
-    newFrontmatter += `\ndraft: false`
-  }
-  if (!fields.includes("tags")) {
-    newFrontmatter += `\ntags: []`
-  }
-  if (!fields.includes("created")) {
-    newFrontmatter += `\ncreated: ${formattedDate} ${formattedTime}`
+  if (parts.length < 3) {
+    // Frontmatter malformato
+    return null
   }
 
-  if (newFrontmatter !== frontmatter) {
-    // Ricostruisce il file con frontmatter aggiornato
-    const restOfFile = data.slice(match[0].length)
-    return `---\n${newFrontmatter}\n---${restOfFile}`
+  const yaml = parts[1].trim()
+  const body = parts.slice(2).join("---").trim()
+
+  const lines = yaml.split("\n").filter(line => line.trim() !== "")
+  const newYaml = []
+  let hasTitle = false
+  let hasDraft = false
+  let hasTags = false
+  let hasCreated = false
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+    if (trimmed.startsWith("title:")) {
+      hasTitle = true
+      newYaml.push(trimmed)
+    } else if (trimmed.startsWith("draft:")) {
+      hasDraft = true
+      newYaml.push(trimmed)
+    } else if (trimmed.startsWith("tags:")) {
+      hasTags = true
+      newYaml.push(trimmed)
+    } else if (trimmed.startsWith("created:")) {
+      hasCreated = true
+      newYaml.push(trimmed)
+    } else {
+      newYaml.push(trimmed)
+    }
   }
 
-  return data // già corretto
+  if (!hasDraft) {
+    newYaml.push("draft: false")
+  }
+  if (!hasTags) {
+    newYaml.push("tags: []")
+  }
+  if (!hasCreated) {
+    const now = new Date().toISOString()
+    newYaml.push(`created: "${now}"`)
+  }
+
+  const fixed = "---\n" + newYaml.join("\n") + "\n---\n\n" + body
+  return fixed
 }
 
-function correggiFile(filePath) {
+function processFile(filePath) {
   const ext = path.extname(filePath)
-  if (ext !== ".md") return
+  if (ext !== ".md") {
+    console.log(`⏭️  Ignorato file non Markdown: ${filePath}`)
+    return
+  }
 
-  const data = fs.readFileSync(filePath, "utf8")
-  const nuovoData = aggiustaFrontmatter(data)
-  
-  if (nuovoData !== data) {
-    fs.writeFileSync(filePath, nuovoData, "utf8")
-    console.log(`✅ Frontmatter corretto: ${filePath}`)
+  const content = fs.readFileSync(filePath, "utf8")
+  const fixed = fixFrontmatter(content)
+
+  if (fixed !== null) {
+    fs.writeFileSync(filePath, fixed, "utf8")
+    console.log(`✅ Sistemato: ${filePath}`)
+  } else {
+    console.log(`⚠️  Frontmatter non modificato (possibile errore YAML): ${filePath}`)
   }
 }
 
-function scanDirectory(directory) {
-  const files = fs.readdirSync(directory)
+function walk(dir) {
+  const files = fs.readdirSync(dir)
+
   for (const file of files) {
-    const filePath = path.join(directory, file)
-    const stat = fs.statSync(filePath)
+    const fullPath = path.join(dir, file)
+    const stat = fs.statSync(fullPath)
 
     if (stat.isDirectory()) {
-      scanDirectory(filePath)
+      walk(fullPath)
     } else {
-      correggiFile(filePath)
+      processFile(fullPath)
     }
   }
 }
 
-// Inizia la sistemazione
 console.log("🔍 Scansiono tutti i file Markdown per sistemare il frontmatter...")
-scanDirectory(contentDir)
+walk(contentDir)
 console.log("🎯 Sistemazione completata!")

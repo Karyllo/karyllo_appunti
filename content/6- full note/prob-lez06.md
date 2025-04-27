@@ -1,3 +1,7 @@
+---
+title: "prob-lez06"
+---
+
 2025-02-26 16:08
 
 _Status: #flashcard_zero  #riscritto_zero  #revisione_zero 

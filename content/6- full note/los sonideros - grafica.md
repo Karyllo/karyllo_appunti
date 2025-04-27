@@ -1,3 +1,7 @@
+---
+title: "los sonideros - grafica"
+---
+
 2025-04-20 17:05
 
 _Status:

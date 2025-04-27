@@ -1,3 +1,7 @@
+---
+title: "meccanica-lez05"
+---
+
 2025-04-25 12:09
 
 _Status: #flashcard_zero  #riscritto_zero  #revisione_zero 

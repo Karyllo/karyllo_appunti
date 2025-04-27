@@ -1,3 +1,7 @@
+---
+title: "fisica1- Lez07"
+---
+
 2025-03-11 13:30
 
 _Status: #flashcard_zero  #riscritto_zero  #revisione_zero 

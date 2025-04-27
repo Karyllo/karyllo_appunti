@@ -1,3 +1,7 @@
+---
+title: "Prob- Lez02"
+---
+
 2025-02-18 08:16
 
 Status: #revisione_in_corso #flashcard_finite #riscritto_zero

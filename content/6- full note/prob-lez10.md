@@ -1,3 +1,7 @@
+---
+title: "prob-lez10"
+---
+
 2025-03-20 16:17
 
 _Status: #flashcard_zero  #riscritto_zero  #revisione_zero 

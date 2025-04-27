@@ -1,3 +1,7 @@
+---
+title: "mateNum- Lez10"
+---
+
 2025-03-11 12:46
 
 _Status: #flashcard_zero  #riscritto_zero  #revisione_zero 

@@ -1,3 +1,7 @@
+---
+title: "fisica-lez03'"
+---
+
 2025-03-04 17:59
 
 _Status: #flashcard_zero  #riscritto_zero  #revisione_zero 

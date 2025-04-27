@@ -1,3 +1,7 @@
+---
+title: "prob-lez19"
+---
+
 2025-04-24 12:49
 
 _Status: #flashcard_zero  #riscritto_zero  #revisione_zero 

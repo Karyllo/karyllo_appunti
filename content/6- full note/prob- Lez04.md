@@ -1,3 +1,7 @@
+---
+title: "prob- Lez04"
+---
+
 2025-02-23 14:35
 
 _Status: #flashcard_finite     #riscritto_finito     #revisione_finita 

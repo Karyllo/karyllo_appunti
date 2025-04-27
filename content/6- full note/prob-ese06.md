@@ -1,3 +1,7 @@
+---
+title: "prob-ese06"
+---
+
 2025-03-20 15:14
 
 _Status: #flashcard_zero  #riscritto_zero  #revisione_zero 

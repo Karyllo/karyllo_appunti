@@ -1,3 +1,7 @@
+---
+title: "chimica-Lez02"
+---
+
 2025-03-02 16:53
 
 _Status: #flashcard_zero  #riscritto_finito   #revisione_finita 

@@ -1,3 +1,7 @@
+---
+title: "mateNum- Lez08"
+---
+
 2025-03-06 15:28
 
 _Status: #flashcard_zero  #riscritto_zero  #revisione_zero 

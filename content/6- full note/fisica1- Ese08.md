@@ -1,3 +1,7 @@
+---
+title: "fisica1- Ese08"
+---
+
 2025-03-12 09:29
 
 _Status: #flashcard_zero  #riscritto_zero  #revisione_zero 

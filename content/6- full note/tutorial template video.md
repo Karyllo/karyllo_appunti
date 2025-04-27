@@ -1,3 +1,7 @@
+---
+title: "tutorial template video"
+---
+
 2025-04-23 15:03
 
 _Tags: [[POLI.RADIO]]  [[tutorial]]

@@ -1,3 +1,7 @@
+---
+title: "fisica1- Lez04"
+---
+
 
 ### Velocità Vettoriale
 

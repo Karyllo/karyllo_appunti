@@ -1,41 +1,71 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs")
+const path = require("path")
 
-const directoryPath = path.join(__dirname, 'content');
+const contentDir = path.join(process.cwd(), "content")
+const indexFile = path.join(contentDir, "index.md")
 
-// Leggi tutti i file nella cartella
-fs.readdirSync(directoryPath).forEach(file => {
-  const fullPath = path.join(directoryPath, file);
-
-  if (fs.lstatSync(fullPath).isFile() && path.extname(fullPath) === '.md') {
-    let content = fs.readFileSync(fullPath, 'utf8').trim();
-    let updated = false;
-
-    // Aggiungi _Status se manca
-    if (!content.includes('_Status:')) {
-      content = `_Status: #da_sistemare\n\n` + content;
-      updated = true;
-    }
-
-    // Aggiungi _Tags se manca
-    if (!content.includes('_Tags:')) {
-      content = content.replace(/_Status:.*?\n/, match => match + `_Tags:\n\n`);
-      updated = true;
-    }
-
-    // Aggiungi # Titolo se manca
-    if (!/^# /.test(content)) {
-      const filenameWithoutExtension = path.basename(file, '.md');
-      content = content + `\n\n# ${filenameWithoutExtension}\n`;
-      updated = true;
-    }
-
-    // Scrivi se abbiamo modificato
-    if (updated) {
-      fs.writeFileSync(fullPath, content, 'utf8');
-      console.log(`Sistemato: ${file}`);
+function findMarkdownFiles(dir) {
+  let files = []
+  for (const file of fs.readdirSync(dir)) {
+    const fullPath = path.join(dir, file)
+    const stat = fs.statSync(fullPath)
+    if (stat.isDirectory()) {
+      files = files.concat(findMarkdownFiles(fullPath))
+    } else if (file.endsWith(".md")) {
+      files.push(fullPath)
     }
   }
-});
+  return files
+}
 
-console.log("✅ Sistemazione completata!");
+function ensureFrontmatter(filepath) {
+  let content = fs.readFileSync(filepath, "utf-8")
+  if (!content.startsWith("---")) {
+    const title = path.basename(filepath, ".md")
+    const newContent = `---
+title: "${title}"
+---
+
+${content}`
+    fs.writeFileSync(filepath, newContent, "utf-8")
+    console.log(`✅ Frontmatter aggiunto a: ${filepath}`)
+  }
+}
+
+function createIndex(files) {
+  let links = files
+    .filter(f => !f.endsWith("index.md"))
+    .map(f => {
+      const relativePath = path.relative(contentDir, f).replace(/\.md$/, "")
+      return `- [[${relativePath}]]`
+    })
+    .join("\n")
+
+  const indexContent = `---
+title: "Indice"
+---
+
+# Indice degli appunti
+
+${links}
+`
+  fs.writeFileSync(indexFile, indexContent, "utf-8")
+  console.log(`📜 Creato nuovo index.md con ${files.length - 1} link!`)
+}
+
+function main() {
+  console.log("🔍 Scansiono tutti i file Markdown...")
+  const files = findMarkdownFiles(contentDir)
+
+  console.log("🛠️ Sistemo i frontmatter...")
+  for (const file of files) {
+    ensureFrontmatter(file)
+  }
+
+  console.log("📝 Creo/aggiorno index.md...")
+  createIndex(files)
+
+  console.log("🎯 Sistemazione completata!")
+}
+
+main()

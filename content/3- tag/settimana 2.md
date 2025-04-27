@@ -1,3 +1,7 @@
+---
+title: "settimana 2"
+---
+
 
 - Matematica numerica
 	1. .[[Matenum- lez03]]

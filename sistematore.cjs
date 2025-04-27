@@ -56,8 +56,13 @@ function fixFrontmatter(content) {
     newYaml.push(`created: "${now}"`)
   }
 
-  const fixed = "---\n" + newYaml.join("\n") + "\n---\n\n" + body
-  return fixed
+  let fixedContent = "---\n" + newYaml.join("\n") + "\n---\n\n" + body;
+  fixedContent = fixObsidianLinks(fixedContent);
+  return fixedContent;
+}
+
+function fixObsidianLinks(content) {
+  return content.replace(/\[([^\]]+)\]\(obsidian:\/\/([^)]+)\)/g, "[$1]/$2");
 }
 
 function processFile(filePath) {
